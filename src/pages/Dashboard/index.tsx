@@ -30,16 +30,22 @@ interface Balance {
 }
 
 const Dashboard: React.FC = () => {
-  // const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   // const [balance, setBalance] = useState<Balance>({} as Balance);
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      // TODO
+      const {
+        data: { transactions },
+      } = await api.get('/transactions');
+
+      setTransactions(transactions);
     }
 
     loadTransactions();
   }, []);
+
+  console.log(transactions);
 
   return (
     <>
@@ -81,18 +87,22 @@ const Dashboard: React.FC = () => {
             </thead>
 
             <tbody>
-              <tr>
-                <td className="title">Computer</td>
-                <td className="income">R$ 5.000,00</td>
-                <td>Sell</td>
-                <td>20/04/2020</td>
-              </tr>
-              <tr>
-                <td className="title">Website Hosting</td>
-                <td className="outcome">- R$ 1.000,00</td>
-                <td>Hosting</td>
-                <td>19/04/2020</td>
-              </tr>
+              {transactions?.map(
+                ({ id, title, type, value, category, created_at }) => {
+                  const formattedValue = formatValue(value, 'BRL');
+                  const formatType =
+                    type === 'outcome' ? `- ${formattedValue}` : formattedValue;
+
+                  return (
+                    <tr key={id}>
+                      <td className="title">{title}</td>
+                      <td className={type}>{formatType}</td>
+                      <td>{category.title}</td>
+                      <td>{created_at}</td>
+                    </tr>
+                  );
+                },
+              )}
             </tbody>
           </table>
         </TableContainer>
