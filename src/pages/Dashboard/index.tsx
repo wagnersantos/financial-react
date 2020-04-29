@@ -32,21 +32,24 @@ interface Balance {
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // const [balance, setBalance] = useState<Balance>({} as Balance);
+  const [balance, setBalance] = useState<Balance>({} as Balance);
+
+  const balanceIncome = formatValue(balance.income);
+  const balanceOutcome = formatValue(balance.outcome);
+  const balanceTotal = formatValue(balance.total);
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
       const {
-        data: { transactions },
+        data: { transactions, balance },
       } = await api.get('/transactions');
 
       setTransactions(transactions);
+      setBalance(balance);
     }
 
     loadTransactions();
   }, []);
-
-  console.log(transactions);
 
   return (
     <>
@@ -58,21 +61,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">R$ 5.000,00</h1>
+            <h1 data-testid="balance-income">{balanceIncome}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">R$ 1.000,00</h1>
+            <h1 data-testid="balance-outcome">{balanceOutcome}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">R$ 4000,00</h1>
+            <h1 data-testid="balance-total">{balanceTotal}</h1>
           </Card>
         </CardContainer>
 
@@ -90,7 +93,7 @@ const Dashboard: React.FC = () => {
             <tbody>
               {transactions?.map(
                 ({ id, title, type, value, category, created_at }) => {
-                  const formattedValue = formatValue(value, 'BRL');
+                  const formattedValue = formatValue(value);
                   const formatType =
                     type === 'outcome' ? `- ${formattedValue}` : formattedValue;
 
