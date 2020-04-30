@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, useEffect } from 'react';
 
 import income from '../../assets/income.svg';
@@ -40,12 +42,14 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const {
-        data: { transactions, balance },
-      } = await api.get('/transactions');
+      try {
+        const { data } = await api.get('/transactions');
 
-      setTransactions(transactions);
-      setBalance(balance);
+        setTransactions(data.transactions);
+        setBalance(data.balance);
+      } catch (err) {
+        console.log(err.response.error);
+      }
     }
 
     loadTransactions();
